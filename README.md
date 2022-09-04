@@ -6,8 +6,11 @@
     client.Authentication = access_token;
     client.Inspect();
 
-    var mediaLocation = client.PostMedia(file);
     var postLocation = client.Post(post);
 
-    Micropub.Client client = Client.Authenticate(host, username, password)
+    var mediaLocation = client.PostMedia(file);
+    var updates = new UpdateModel();
+
+    updates.Add("photo", new []{mediaLocation.ToString()});
+    client.PostUpdate(postLocation, updates);
 ```

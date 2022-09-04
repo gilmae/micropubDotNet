@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using mf;
@@ -85,5 +85,23 @@ namespace Micropub {
             return null;
 
         }
+
+        public async Task<bool> PostUpdate (Uri itemUri, UpdateModel updates) {
+            RestClient client = new RestClient (MicropubEndpoint);
+            client.Authenticator = new JwtAuthenticator (Authentication);
+
+            var request = new RestRequest ("", Method.Post);
+            request.AddJsonBody (new {
+                action = "update",
+                    url = itemUri.ToString (),
+                    add = updates.Add,
+                    replace = updates.Replace,
+                    delete = updates.Delete
+            });
+
+            var response = await client.ExecutePostAsync (request);
+            return response.IsSuccessful;
+        }
+
     }
 }
