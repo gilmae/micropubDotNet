@@ -1,11 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+   <TargetFramework>net6.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <PackageId>MicropubDotNet</PackageId>
+    <Version>0.1-alpha</Version>
+    <Authors>David Edgar</Authors>
+    <PackageDescription>A micropub client.</PackageDescription>
+    <RepositoryUrl>https://github.com/gilmae/MicropubDotNet</RepositoryUrl>
+
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="mfdotnet" Version="1.0.9" />
+    <PackageReference Include="mfdotnet" Version="1.1.12" />
+    <PackageReference Include="RestSharp" Version="108.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="RestSharp" />
+  </ItemGroup>
 </Project>

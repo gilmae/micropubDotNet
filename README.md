@@ -2,10 +2,12 @@
 
 ## Usage
 ```
-    Micropub.Server server = Micropub.Server.Discover(new Uri("http://sample.org"));
-    var context = server.Authenticate(access_token);
-    var client = new Micropub.Client(context);
+    Micropub.Client client = Micropub.Client.Discover(new Uri("http://sample.org"));
+    client.Authentication = access_token;
+    client.Inspect();
 
     var mediaLocation = client.PostMedia(file);
     var postLocation = client.Post(post);
+
+    Micropub.Client client = Client.Authenticate(host, username, password)
 ```
