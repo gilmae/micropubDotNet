@@ -38,24 +38,20 @@ namespace Micropub {
             }
         }
 
-        public async Task<Uri> Post(Microformat item)
-        {
-            RestClient client = new RestClient(MicropubEndpoint);
-            client.Authenticator = new JwtAuthenticator(Authentication);
+        public async Task<Uri> Post (Microformat item) {
+            RestClient client = new RestClient (MicropubEndpoint);
+            client.Authenticator = new JwtAuthenticator (Authentication);
 
-            var request = new RestRequest("", Method.Post);
-            request.AddJsonBody(item);
+            var request = new RestRequest ("", Method.Post);
+            request.AddJsonBody (item);
 
-            var response = await client.ExecutePostAsync(request);
+            var response = await client.ExecutePostAsync (request);
 
-            if (response.IsSuccessful)
-            {
+            if (response.IsSuccessful) {
 
-                foreach (var h in response.Headers)
-                {
-                    if (h.Name.ToLower() == "location")
-                    {
-                        return new Uri(h.Value.ToString());
+                foreach (var h in response.Headers) {
+                    if (h.Name.ToLower () == "location") {
+                        return new Uri (h.Value.ToString ());
                     }
                 }
 
@@ -63,30 +59,25 @@ namespace Micropub {
             return null;
         }
 
-        public async Task<Uri> PostMedia(string path)
-        {
-            if (!File.Exists(path))
-            {
+        public async Task<Uri> PostMedia (string path) {
+            if (!File.Exists (path)) {
                 return null;
             }
-            RestClient client = new RestClient(MediaEndpoint);
-            client.Authenticator = new JwtAuthenticator(Authentication);
+            RestClient client = new RestClient (MediaEndpoint);
+            client.Authenticator = new JwtAuthenticator (Authentication);
 
-            var mediaPostRequest = new RestRequest("", Method.Post);
-            
-            mediaPostRequest.AddFile("file", path);
-            mediaPostRequest.AddHeader("Content-Type", "multipart/form-data");
-            mediaPostRequest.AddHeader("Accept", "application/json");
-            var response = await client.ExecutePostAsync(mediaPostRequest);
+            var mediaPostRequest = new RestRequest ("", Method.Post);
 
-            if (response.IsSuccessful)
-            {
+            mediaPostRequest.AddFile ("file", path);
+            mediaPostRequest.AddHeader ("Content-Type", "multipart/form-data");
+            mediaPostRequest.AddHeader ("Accept", "application/json");
+            var response = await client.ExecutePostAsync (mediaPostRequest);
 
-                foreach (var h in response.Headers)
-                {
-                    if (h.Name.ToLower() == "location")
-                    {
-                        return new Uri(h.Value.ToString());
+            if (response.IsSuccessful) {
+
+                foreach (var h in response.Headers) {
+                    if (h.Name.ToLower () == "location") {
+                        return new Uri (h.Value.ToString ());
                     }
                 }
 
