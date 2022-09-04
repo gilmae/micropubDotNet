@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using mf;
@@ -7,8 +7,8 @@ using RestSharp.Authenticators;
 
 namespace Micropub {
     public class Client {
-        public Uri MicropubEndpoint { get;  set; }
-        public Uri MediaEndpoint { get;  set; }
+        public Uri MicropubEndpoint { get; set; }
+        public Uri MediaEndpoint { get; set; }
         public string Authentication { get; set; }
 
         public static Client Discover (Uri address) {
