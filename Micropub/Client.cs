@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using mf;
@@ -36,6 +36,31 @@ namespace Micropub {
                 var capabilities = System.Text.Json.JsonSerializer.Deserialize<Capabilities> (response.Content);
                 MediaEndpoint = new Uri (capabilities.MediaEndpoint);
             }
+        }
+
+        public async Task<Uri> Post(Microformat item)
+        {
+            RestClient client = new RestClient(MicropubEndpoint);
+            client.Authenticator = new JwtAuthenticator(Authentication);
+
+            var request = new RestRequest("", Method.Post);
+            request.AddJsonBody(item);
+
+            var response = await client.ExecutePostAsync(request);
+
+            if (response.IsSuccessful)
+            {
+
+                foreach (var h in response.Headers)
+                {
+                    if (h.Name.ToLower() == "location")
+                    {
+                        return new Uri(h.Value.ToString());
+                    }
+                }
+
+            }
+            return null;
         }
 
         public async Task<Uri> PostMedia(string path)
