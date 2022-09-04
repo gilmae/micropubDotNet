@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+namespace Micropub;
 public record UpdateModel {
     public Dictionary<string, object[]> Add { get; set; } = new Dictionary<string, object[]> ();
 
