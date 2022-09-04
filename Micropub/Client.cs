@@ -38,5 +38,36 @@ namespace Micropub {
             }
         }
 
+        public async Task<Uri> PostMedia(string path)
+        {
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+            RestClient client = new RestClient(MediaEndpoint);
+            client.Authenticator = new JwtAuthenticator(Authentication);
+
+            var mediaPostRequest = new RestRequest("", Method.Post);
+            
+            mediaPostRequest.AddFile("file", path);
+            mediaPostRequest.AddHeader("Content-Type", "multipart/form-data");
+            mediaPostRequest.AddHeader("Accept", "application/json");
+            var response = await client.ExecutePostAsync(mediaPostRequest);
+
+            if (response.IsSuccessful)
+            {
+
+                foreach (var h in response.Headers)
+                {
+                    if (h.Name.ToLower() == "location")
+                    {
+                        return new Uri(h.Value.ToString());
+                    }
+                }
+
+            }
+            return null;
+
+        }
     }
 }
