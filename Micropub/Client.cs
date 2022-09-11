@@ -103,5 +103,22 @@ namespace Micropub {
             return response.IsSuccessful;
         }
 
+        public async Task<Microformat> Get (Uri url) {
+            RestClient client = new RestClient (MicropubEndpoint);
+            client.Authenticator = new JwtAuthenticator (Authentication);
+
+            var request = new RestRequest ("", Method.Get);
+            request.AddQueryParameter ("q", "source");
+            request.AddQueryParameter ("url", url.ToString ());
+
+            var response = await client.ExecuteAsync<Microformat> (request);
+
+            if (response.IsSuccessful) {
+
+                return response.Data;
+
+            }
+            return null;
+        }
     }
 }
