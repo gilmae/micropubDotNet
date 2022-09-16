@@ -26,7 +26,7 @@ namespace Micropub {
         public void Inspect () {
             var rest = new RestClient (MicropubEndpoint);
 
-            var request = new RestRequest ("/micropub")
+            var request = new RestRequest ("/")
                 .AddQueryParameter ("q", "config");
             request.AddHeader ("Authorization", $"Bearer {Authentication}");
 
