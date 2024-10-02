@@ -5,53 +5,67 @@ using mf;
 using RestSharp;
 using RestSharp.Authenticators;
 
-namespace Micropub {
-    public class Client {
+namespace Micropub
+{
+    public class Client
+    {
         public Uri MicropubEndpoint { get; set; }
         public Uri MediaEndpoint { get; set; }
         public string Authentication { get; set; }
 
-        public static Client Discover (Uri address) {
-            Client c = new Client ();
+        public static Client Discover(Uri address)
+        {
+            Client c = new Client();
 
-            var parser = new Parser ();
-            var doc = parser.Parse (address);
-            if (doc.Rels.ContainsKey ("micropub") && doc.Rels["micropub"] != null) {
-                c.MicropubEndpoint = new Uri (doc.Rels["micropub"][0]);
+            var parser = new Parser();
+            var doc = parser.Parse(address);
+            if (doc.Rels.ContainsKey("micropub") && doc.Rels["micropub"] != null)
+            {
+                c.MicropubEndpoint = new Uri(doc.Rels["micropub"][0]);
             }
 
             return c;
         }
 
-        public void Inspect () {
-            var rest = new RestClient (MicropubEndpoint);
+        public void Inspect()
+        {
+            var rest = new RestClient(MicropubEndpoint);
 
-            var request = new RestRequest ("/")
-                .AddQueryParameter ("q", "config");
-            request.AddHeader ("Authorization", $"Bearer {Authentication}");
+            var request = new RestRequest("/")
+                .AddQueryParameter("q", "config");
+            request.AddHeader("Authorization", $"Bearer {Authentication}");
 
-            var response = rest.Get (request);
+            var response = rest.Get(request);
 
-            if (response.IsSuccessful) {
-                var capabilities = System.Text.Json.JsonSerializer.Deserialize<Capabilities> (response.Content);
-                MediaEndpoint = new Uri (capabilities.MediaEndpoint);
+            if (response.IsSuccessful)
+            {
+                var capabilities = System.Text.Json.JsonSerializer.Deserialize<Capabilities>(response.Content);
+                MediaEndpoint = new Uri(capabilities.MediaEndpoint);
             }
         }
 
-        public async Task<Uri> Post (Microformat item) {
-            RestClient client = new RestClient (MicropubEndpoint);
-            client.Authenticator = new JwtAuthenticator (Authentication);
+        public async Task<Uri> Post(Microformat item)
+        {
+            var options = new RestClientOptions(MicropubEndpoint)
+            {
+                Authenticator = new JwtAuthenticator(Authentication)
+            };
 
-            var request = new RestRequest ("", Method.Post);
-            request.AddJsonBody (item);
+            RestClient client = new RestClient(options);
 
-            var response = await client.ExecutePostAsync (request);
+            var request = new RestRequest("", Method.Post);
+            request.AddJsonBody(item);
 
-            if (response.IsSuccessful) {
+            var response = await client.ExecutePostAsync(request);
 
-                foreach (var h in response.Headers) {
-                    if (h.Name.ToLower () == "location") {
-                        return new Uri (h.Value.ToString ());
+            if (response.IsSuccessful)
+            {
+
+                foreach (var h in response.Headers)
+                {
+                    if (h.Name.ToLower() == "location")
+                    {
+                        return new Uri(h.Value.ToString());
                     }
                 }
 
@@ -59,25 +73,34 @@ namespace Micropub {
             return null;
         }
 
-        public async Task<Uri> PostMedia (string path) {
-            if (!File.Exists (path)) {
+        public async Task<Uri> PostMedia(string path)
+        {
+            if (!File.Exists(path))
+            {
                 return null;
             }
-            RestClient client = new RestClient (MediaEndpoint);
-            client.Authenticator = new JwtAuthenticator (Authentication);
 
-            var mediaPostRequest = new RestRequest ("", Method.Post);
+            var options = new RestClientOptions(MediaEndpoint)
+            {
+                Authenticator = new JwtAuthenticator(Authentication)
+            };
+            RestClient client = new RestClient(options);
 
-            mediaPostRequest.AddFile ("file", path);
-            mediaPostRequest.AddHeader ("Content-Type", "multipart/form-data");
-            mediaPostRequest.AddHeader ("Accept", "application/json");
-            var response = await client.ExecutePostAsync (mediaPostRequest);
+            var mediaPostRequest = new RestRequest("", Method.Post);
 
-            if (response.IsSuccessful) {
+            mediaPostRequest.AddFile("file", path);
+            mediaPostRequest.AddHeader("Content-Type", "multipart/form-data");
+            mediaPostRequest.AddHeader("Accept", "application/json");
+            var response = await client.ExecutePostAsync(mediaPostRequest);
 
-                foreach (var h in response.Headers) {
-                    if (h.Name.ToLower () == "location") {
-                        return new Uri (h.Value.ToString ());
+            if (response.IsSuccessful)
+            {
+
+                foreach (var h in response.Headers)
+                {
+                    if (h.Name.ToLower() == "location")
+                    {
+                        return new Uri(h.Value.ToString());
                     }
                 }
 
@@ -86,34 +109,44 @@ namespace Micropub {
 
         }
 
-        public async Task<bool> PostUpdate (Uri itemUri, UpdateModel updates) {
-            RestClient client = new RestClient (MicropubEndpoint);
-            client.Authenticator = new JwtAuthenticator (Authentication);
+        public async Task<bool> PostUpdate(Uri itemUri, UpdateModel updates)
+        {
+            var options = new RestClientOptions(MicropubEndpoint)
+            {
+                Authenticator = new JwtAuthenticator(Authentication)
+            };
+            RestClient client = new RestClient(options);
 
-            var request = new RestRequest ("", Method.Post);
-            request.AddJsonBody (new {
+            var request = new RestRequest("", Method.Post);
+            request.AddJsonBody(new
+            {
                 action = "update",
-                    url = itemUri.ToString (),
-                    add = updates.Add,
-                    replace = updates.Replace,
-                    delete = updates.Delete
+                url = itemUri.ToString(),
+                add = updates.Add,
+                replace = updates.Replace,
+                delete = updates.Delete
             });
 
-            var response = await client.ExecutePostAsync (request);
+            var response = await client.ExecutePostAsync(request);
             return response.IsSuccessful;
         }
 
-        public async Task<Microformat> Get (Uri url) {
-            RestClient client = new RestClient (MicropubEndpoint);
-            client.Authenticator = new JwtAuthenticator (Authentication);
+        public async Task<Microformat> Get(Uri url)
+        {
+            var options = new RestClientOptions(MicropubEndpoint)
+            {
+                Authenticator = new JwtAuthenticator(Authentication)
+            };
+            RestClient client = new RestClient(options);
 
-            var request = new RestRequest ("", Method.Get);
-            request.AddQueryParameter ("q", "source");
-            request.AddQueryParameter ("url", url.ToString ());
+            var request = new RestRequest("", Method.Get);
+            request.AddQueryParameter("q", "source");
+            request.AddQueryParameter("url", url.ToString());
 
-            var response = await client.ExecuteAsync<Microformat> (request);
+            var response = await client.ExecuteAsync<Microformat>(request);
 
-            if (response.IsSuccessful) {
+            if (response.IsSuccessful)
+            {
 
                 return response.Data;
 
